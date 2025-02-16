@@ -11,7 +11,7 @@ export default class PornhubProvider implements ContentProvider {
   readonly channel = PORNHUB_CHANNEL;
   private readonly baseUrl = "https://www.pornhub.com";
 
-  async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: SearchOptions): Promise<VideoResult> {
     const url = this.buildUrl(options);
 
     const response = await axios.get(url, {
@@ -23,7 +23,7 @@ export default class PornhubProvider implements ContentProvider {
     const $ = cheerio.load(response.data);
     const videos = this.parseVideos($);
     const totalResults = this.parseTotalResults($);
-    const currentPage = options.pagination?.page || 1;
+    const currentPage = options?.page || 1;
     const itemsPerPage = 25;
 
     return {
@@ -43,7 +43,7 @@ export default class PornhubProvider implements ContentProvider {
     }
 
     // Add page number
-    params.set("page", String(options.pagination?.page || 1));
+    params.set("page", String(options.page || 1));
 
     // Handle sort option
     const sortValue = options.filters?.sort;

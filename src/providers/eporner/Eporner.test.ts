@@ -27,7 +27,8 @@ describe("EpornerProvider", () => {
   describe("URL building", () => {
     it("builds basic search URL with defaults", async () => {
       const options: SearchOptions = {
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       await provider.getVideos(options);
@@ -49,7 +50,8 @@ describe("EpornerProvider", () => {
     it("includes search query when provided", async () => {
       const options: SearchOptions = {
         query: "test search",
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       await provider.getVideos(options);
@@ -61,7 +63,8 @@ describe("EpornerProvider", () => {
 
     it("handles different sort options", async () => {
       const options: SearchOptions = {
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
         filters: { sort: "latest" },
       };
 
@@ -102,7 +105,8 @@ describe("EpornerProvider", () => {
       mockedAxios.get.mockResolvedValueOnce(mockApiResponse);
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos[0]).toEqual({
@@ -151,7 +155,8 @@ describe("EpornerProvider", () => {
       mockedAxios.get.mockResolvedValueOnce(responseWithMissingFields);
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos[0].rating).toBeUndefined();
@@ -169,7 +174,8 @@ describe("EpornerProvider", () => {
       });
 
       let result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.hasNextPage).toBe(true);
@@ -184,7 +190,8 @@ describe("EpornerProvider", () => {
       });
 
       result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.hasNextPage).toBe(false);
@@ -197,7 +204,8 @@ describe("EpornerProvider", () => {
 
       await expect(
         provider.getVideos({
-          pagination: { page: 1, limit: 25 },
+          page: 1,
+          // limit: 25,
         })
       ).rejects.toThrow("API Error");
     });

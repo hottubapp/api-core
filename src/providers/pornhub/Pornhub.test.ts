@@ -26,7 +26,8 @@ describe("PornhubProvider", () => {
   describe("URL building", () => {
     it("builds basic search URL with defaults", async () => {
       const options: SearchOptions = {
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       await provider.getVideos(options);
@@ -45,7 +46,8 @@ describe("PornhubProvider", () => {
     it("includes search query when provided", async () => {
       const options: SearchOptions = {
         query: "test search",
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       await provider.getVideos(options);
@@ -59,7 +61,8 @@ describe("PornhubProvider", () => {
 
     it("handles different sort options", async () => {
       const options: SearchOptions = {
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
         filters: { sort: "recent" },
       };
 
@@ -100,7 +103,8 @@ describe("PornhubProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: mockHtmlResponse });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos[0]).toEqual({
@@ -144,7 +148,8 @@ describe("PornhubProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: htmlWithMissingFields });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos[0].preview).toBeUndefined();
@@ -163,7 +168,8 @@ describe("PornhubProvider", () => {
       });
 
       let result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.hasNextPage).toBe(true);
@@ -179,7 +185,8 @@ describe("PornhubProvider", () => {
       });
 
       result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.hasNextPage).toBe(false);
@@ -192,7 +199,8 @@ describe("PornhubProvider", () => {
 
       await expect(
         provider.getVideos({
-          pagination: { page: 1, limit: 25 },
+          page: 1,
+          // limit: 25,
         })
       ).rejects.toThrow("Network Error");
     });

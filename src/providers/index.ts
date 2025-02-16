@@ -1,4 +1,4 @@
-export * as eporner from "./eporner/EpornerProvider";
-export * as pornhub from "./pornhub/PornhubProvider";
-export * as xvideos from "./xvideos/XvideosProvider";
-export * as xnxx from "./xnxx/XnxxProvider";
+export { default as eporner } from "./eporner/EpornerProvider";
+export { default as pornhub } from "./pornhub/PornhubProvider";
+export { default as xvideos } from "./xvideos/XvideosProvider";
+export { default as xnxx } from "./xnxx/XnxxProvider";

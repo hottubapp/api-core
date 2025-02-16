@@ -11,7 +11,7 @@ export default class XnxxProvider implements ContentProvider {
   readonly channel = XNXX_CHANNEL;
   private readonly baseUrl = "https://www.xnxx.com";
 
-  async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: SearchOptions): Promise<VideoResult> {
     const url = this.buildUrl(options);
 
     const response = await axios.get(url);
@@ -19,7 +19,7 @@ export default class XnxxProvider implements ContentProvider {
     const videos = this.parseVideos($);
 
     // XNXX shows 32 videos per page
-    const currentPage = options.pagination?.page || 1;
+    const currentPage = options?.page || 1;
     const hasMore = $("#content .mozaique .thumb-block").length === 32;
 
     return {
@@ -34,7 +34,7 @@ export default class XnxxProvider implements ContentProvider {
       return this.buildPopularUrl(options);
     }
 
-    const page = options.pagination?.page || 1;
+    const page = options?.page || 1;
     const pageParam = page > 1 ? `/${page - 1}` : "";
 
     // Handle sort option
@@ -52,7 +52,7 @@ export default class XnxxProvider implements ContentProvider {
   private buildPopularUrl(options: SearchOptions): string {
     const date = new Date();
     let year = date.getFullYear();
-    const page = options.pagination?.page || 1;
+    const page = options?.page || 1;
     let monthOffset = date.getMonth() + 1 - (page - 1);
 
     // If it's the first of the month, use previous month

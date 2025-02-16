@@ -9,7 +9,7 @@ export abstract class BaseScraper implements ContentProvider {
 
   // Common scraper utilities can go here
   protected validateOptions(options: SearchOptions): void {
-    if (options.pagination.page < 1) throw new Error("Page must be >= 1");
-    if (options.pagination.limit < 1) throw new Error("Limit must be >= 1");
+    if (options.page < 1) throw new Error("Page must be >= 1");
+    // if (options.limit < 1) throw new Error("Limit must be >= 1");
   }
 }

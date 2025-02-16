@@ -60,7 +60,7 @@ export default class EpornerProvider implements ContentProvider {
     });
   }
 
-  async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: SearchOptions): Promise<VideoResult> {
     this.validateFilters(options.filters);
     const url = this.buildUrl(options);
 
@@ -91,7 +91,7 @@ export default class EpornerProvider implements ContentProvider {
     }
 
     // Add page number
-    params.set("page", String(options.pagination?.page || 1));
+    params.set("page", String(options?.page || 1));
 
     // Handle sort option
     const sortValue = options.filters?.sort;

@@ -18,7 +18,8 @@ describe("XvideosProvider", () => {
     it("builds search URL with query", async () => {
       const options: SearchOptions = {
         query: "test search",
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -33,7 +34,8 @@ describe("XvideosProvider", () => {
     it("includes page number in search URL", async () => {
       const options: SearchOptions = {
         query: "test",
-        pagination: { page: 3, limit: 25 },
+        page: 3,
+        // limit: 25,
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -47,7 +49,8 @@ describe("XvideosProvider", () => {
 
     it("builds popular URL correctly", async () => {
       const options: SearchOptions = {
-        pagination: { page: 2, limit: 25 },
+        page: 2,
+        // limit: 25,
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -62,7 +65,8 @@ describe("XvideosProvider", () => {
     it("handles different sort options", async () => {
       const options: SearchOptions = {
         query: "test",
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
         filters: { sort: "rating" },
       };
 
@@ -109,7 +113,8 @@ describe("XvideosProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: mockHtmlResponse });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       const video = result.videos[0];
@@ -152,7 +157,8 @@ describe("XvideosProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: htmlWithMissingFields });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos[0].views).toBeUndefined();
@@ -190,7 +196,8 @@ describe("XvideosProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: fullPageHtml });
 
       let result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.hasNextPage).toBe(true);
@@ -223,7 +230,8 @@ describe("XvideosProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: lastPageHtml });
 
       result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.hasNextPage).toBe(false);
@@ -236,7 +244,8 @@ describe("XvideosProvider", () => {
 
       await expect(
         provider.getVideos({
-          pagination: { page: 1, limit: 25 },
+          page: 1,
+          // limit: 25,
         })
       ).rejects.toThrow("Network Error");
     });
@@ -245,7 +254,8 @@ describe("XvideosProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: "Invalid HTML" });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos).toEqual([]);

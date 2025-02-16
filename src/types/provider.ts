@@ -1,5 +1,5 @@
 import { Video } from "../models/Video";
-import { PaginationOptions, SearchOptions } from "../models/SearchOptions";
+import { SearchOptions } from "../models/SearchOptions";
 import { Channel } from "./channel";
 
 export interface VideoResult {

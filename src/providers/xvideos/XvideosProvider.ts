@@ -11,7 +11,7 @@ export default class XvideosProvider implements ContentProvider {
   readonly channel = XVIDEOS_CHANNEL;
   private readonly baseUrl = "https://www.xvideos.com";
 
-  async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: SearchOptions): Promise<VideoResult> {
     const url = this.buildUrl(options);
 
     const response = await axios.get(url);
@@ -33,7 +33,7 @@ export default class XvideosProvider implements ContentProvider {
       return this.buildPopularUrl(options);
     }
 
-    const page = options.pagination?.page || 1;
+    const page = options?.page || 1;
     const pageParam = `p=${Math.max(0, page - 1)}`;
 
     // Handle sort option
@@ -49,7 +49,7 @@ export default class XvideosProvider implements ContentProvider {
   }
 
   private buildPopularUrl(options: SearchOptions): string {
-    const page = options.pagination?.page || 1;
+    const page = options?.page || 1;
     return `${this.baseUrl}/new/${page}`;
   }
 

@@ -18,7 +18,8 @@ describe("XnxxProvider", () => {
     it("builds search URL with query", async () => {
       const options: SearchOptions = {
         query: "test search",
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -33,7 +34,8 @@ describe("XnxxProvider", () => {
     it("includes page number in search URL", async () => {
       const options: SearchOptions = {
         query: "test",
-        pagination: { page: 3, limit: 25 },
+        page: 3,
+        // limit: 25,
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -47,7 +49,8 @@ describe("XnxxProvider", () => {
 
     it("builds popular URL with correct month", async () => {
       const options: SearchOptions = {
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -69,7 +72,8 @@ describe("XnxxProvider", () => {
     it("handles different sort options", async () => {
       const options: SearchOptions = {
         query: "test",
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
         filters: { sort: "rating" },
       };
 
@@ -114,7 +118,8 @@ describe("XnxxProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: mockHtmlResponse });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       const video = result.videos[0];
@@ -154,7 +159,8 @@ describe("XnxxProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: htmlWithMissingFields });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos[0].views).toBeUndefined();
@@ -170,7 +176,8 @@ describe("XnxxProvider", () => {
 
       await expect(
         provider.getVideos({
-          pagination: { page: 1, limit: 25 },
+          page: 1,
+          // limit: 25,
         })
       ).rejects.toThrow("Network Error");
     });
@@ -179,7 +186,8 @@ describe("XnxxProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: "Invalid HTML" });
 
       const result = await provider.getVideos({
-        pagination: { page: 1, limit: 25 },
+        page: 1,
+        // limit: 25,
       });
 
       expect(result.videos).toEqual([]);
