@@ -15,3 +15,23 @@ Providers are registered in the `providers` object.
 Channels are defined as constants in the `channels` object.
 
 Channels are used to identify the source of the content.
+
+## Registry
+
+The registry is a class that contains the providers and channels.
+
+It is used to get the appropriate provider and channel for a given network.
+
+You may register additional providers and channels in the registry.
+
+```ts
+const registry = new VideoProviderRegistry({
+  hottub: HotTubProvider, // Hot Tub Pro for example
+});
+```
+
+## Usage
+
+```ts
+const videos = await registry.getVideos("hottub", { query: "test" });
+```
