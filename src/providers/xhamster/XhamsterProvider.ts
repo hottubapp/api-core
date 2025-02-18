@@ -16,7 +16,9 @@ export default class XhamsterProvider implements ContentProvider {
     const url = this.buildUrl(options);
 
     try {
-      const response = await cloudscraper(url, {
+      const response = await cloudscraper({
+        method: "GET",
+        url,
         headers: {
           Cookie: "parental-control=yes;",
           "User-Agent":
