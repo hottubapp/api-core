@@ -1,10 +1,17 @@
-import PornhubProvider from "./providers/pornhub/PornhubProvider";
-import XnxxProvider from "./providers/xnxx/XnxxProvider";
-import XvideosProvider from "./providers/xvideos/XvideosProvider";
-import EpornerProvider from "./providers/eporner/EpornerProvider";
+import { VideoProviderRegistry } from "./index";
 
-async function testProvider(name: string, provider: any) {
+const registry = new VideoProviderRegistry();
+const providers = registry.providers;
+
+async function testProvider(name: string, providerClass: any) {
   console.log(`\nTesting ${name}...`);
+
+  const provider = new providerClass();
+
+  if (!provider) {
+    console.error(`❌ Provider ${name} not found`);
+    return;
+  }
 
   try {
     // Test search
@@ -30,19 +37,9 @@ async function testProvider(name: string, provider: any) {
 }
 
 async function main(providerName?: string) {
-  const providers = {
-    pornhub: new PornhubProvider(),
-    xnxx: new XnxxProvider(),
-    xvideos: new XvideosProvider(),
-    eporner: new EpornerProvider(),
-  };
-
   // If a specific provider is provided, test that provider
   if (providerName && providers[providerName as keyof typeof providers]) {
-    await testProvider(
-      providerName as keyof typeof providers,
-      providers[providerName as keyof typeof providers]
-    );
+    await testProvider(providerName as keyof typeof providers, providers[providerName as keyof typeof providers]);
   } else {
     for (const [name, provider] of Object.entries(providers)) {
       await testProvider(name, provider);

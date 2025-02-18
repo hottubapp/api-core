@@ -1,4 +1,4 @@
-import { Channel } from "@/types";
+import { Channel, ChannelStatus } from "@/types";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
@@ -13,7 +13,7 @@ export const PORNHUB_CHANNEL: Channel = {
   name: "PornHub",
   description: "Home of the best hardcore free porn videos with the hottest adult stars.",
   favicon: "https://www.google.com/s2/favicons?sz=64&domain=pornhub.com",
-  status: "active",
+  status: ChannelStatus.Active,
   options: [
     {
       id: "sort",
@@ -24,4 +24,5 @@ export const PORNHUB_CHANNEL: Channel = {
     },
   ],
   categories: [],
+  nsfw: true,
 };

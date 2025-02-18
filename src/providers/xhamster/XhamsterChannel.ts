@@ -2,17 +2,17 @@ import { Channel, ChannelStatus } from "@/types";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
-  recent: { id: "recent", title: "Newest", value: "sort=uploaddate" },
-  rating: { id: "rating", title: "Top Rated", value: "sort=rating" },
+  new: { id: "new", title: "Newest", value: "sort=newest" },
   views: { id: "views", title: "Most Viewed", value: "sort=views" },
-  duration: { id: "duration", title: "Longest", value: "sort=length" },
+  rating: { id: "rating", title: "Top Rated", value: "sort=rating" },
+  duration: { id: "duration", title: "Longest", value: "sort=duration" },
 } as const;
 
-export const XNXX_CHANNEL: Channel = {
-  id: "xnxx",
-  name: "XNXX",
-  description: "XNXX delivers free sex movies and fast free porn videos (tube porn).",
-  favicon: "https://www.google.com/s2/favicons?sz=64&domain=xnxx.com",
+export const XHAMSTER_CHANNEL: Channel = {
+  id: "xhamster",
+  name: "XHamster",
+  description: "XHamster is a porn site that allows you to watch porn videos for free.",
+  favicon: "https://www.google.com/s2/favicons?sz=64&domain=https://xhamster.com",
   status: ChannelStatus.Active,
   options: [
     {

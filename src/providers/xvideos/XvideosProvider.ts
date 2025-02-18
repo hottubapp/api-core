@@ -43,9 +43,7 @@ export default class XvideosProvider implements ContentProvider {
         ? SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].value
         : "";
 
-    return `${this.baseUrl}/?k=${encodeURIComponent(options.query)}&${pageParam}${
-      sortParam ? "&" + sortParam : ""
-    }`;
+    return `${this.baseUrl}/?k=${encodeURIComponent(options.query)}&${pageParam}${sortParam ? "&" + sortParam : ""}`;
   }
 
   private buildPopularUrl(options: SearchOptions): string {

@@ -19,7 +19,6 @@ export default class XnxxProvider implements ContentProvider {
     const videos = this.parseVideos($);
 
     // XNXX shows 32 videos per page
-    const currentPage = options?.page || 1;
     const hasMore = $("#content .mozaique .thumb-block").length === 32;
 
     return {
@@ -44,15 +43,13 @@ export default class XnxxProvider implements ContentProvider {
         ? SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].value
         : "";
 
-    return `${this.baseUrl}/search/${encodeURIComponent(options.query)}${pageParam}${
-      sortParam ? "?" + sortParam : ""
-    }`;
+    return `${this.baseUrl}/search/${encodeURIComponent(options.query)}${pageParam}${sortParam ? "?" + sortParam : ""}`;
   }
 
   private buildPopularUrl(options: SearchOptions): string {
     const date = new Date();
     let year = date.getFullYear();
-    const page = options?.page || 1;
+    const page = options.page || 1;
     let monthOffset = date.getMonth() + 1 - (page - 1);
 
     // If it's the first of the month, use previous month
@@ -87,15 +84,12 @@ export default class XnxxProvider implements ContentProvider {
         const uploaderUrl = $uploaderEl.attr("href");
 
         // Thumbnail and preview
-        const thumb =
-          $el.find(".thumb img").attr("data-src") || $el.find(".thumb img").attr("src") || "";
+        const thumb = $el.find(".thumb img").attr("data-src") || $el.find(".thumb img").attr("src") || "";
         const videoId = $el.find(".thumb img").attr("data-videoid");
 
         // Metadata
         const $metadata = $el.find(".thumb-under p.metadata");
-        const duration = this.parseDuration(
-          $metadata.clone().children().remove().end().text().trim()
-        );
+        const duration = this.parseDuration($metadata.clone().children().remove().end().text().trim());
 
         // Parse views - return undefined if not found
         const viewsText = $metadata.find(".right").clone().children().remove().end().text().trim();

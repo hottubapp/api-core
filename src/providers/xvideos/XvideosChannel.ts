@@ -1,4 +1,4 @@
-import { Channel } from "@/types";
+import { Channel, ChannelStatus } from "@/types";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
@@ -14,7 +14,7 @@ export const XVIDEOS_CHANNEL: Channel = {
   name: "XVideos",
   description: "The best free porn videos on internet.",
   favicon: "https://www.google.com/s2/favicons?sz=64&domain=xvideos.com",
-  status: "active",
+  status: ChannelStatus.Active,
   options: [
     {
       id: "sort",

@@ -1,4 +1,4 @@
-import { Channel } from "@/types/channel";
+import { Channel, ChannelStatus } from "@/types/channel";
 
 export const SORT_OPTIONS = {
   popular: { id: "popular", title: "Popular", value: "popular" },
@@ -15,7 +15,7 @@ export const EPORNER_CHANNEL: Channel = {
   name: "Eporner",
   favicon: "https://www.google.com/s2/favicons?sz=64&domain=eporner.com",
   description: "Watch Full HD Porn Videos for free.",
-  status: "active",
+  status: ChannelStatus.Active,
   options: [
     {
       id: "sort",
@@ -26,4 +26,5 @@ export const EPORNER_CHANNEL: Channel = {
     },
   ],
   categories: [],
+  nsfw: true,
 };
