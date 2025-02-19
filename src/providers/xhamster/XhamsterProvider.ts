@@ -1,12 +1,15 @@
-import axios from "axios";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
-import cloudscraper from "cloudscraper";
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
 import { ContentProvider, VideoResult } from "@/types";
 import { Video } from "@/models/Video";
 import { SearchOptions } from "@/models/SearchOptions";
 import { XHAMSTER_CHANNEL, SORT_OPTIONS } from "./XhamsterChannel";
+
+// Use the stealth plugin
+puppeteer.use(StealthPlugin());
 
 export default class XhamsterProvider implements ContentProvider {
   readonly channel = XHAMSTER_CHANNEL;
@@ -16,17 +19,8 @@ export default class XhamsterProvider implements ContentProvider {
     const url = this.buildUrl(options);
 
     try {
-      const response = await cloudscraper({
-        method: "GET",
-        url,
-        headers: {
-          Cookie: "parental-control=yes;",
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        },
-      });
-
-      const $ = cheerio.load(response.toString());
+      const content = await this.fetchData(url);
+      const $ = cheerio.load(content);
       const videos = this.parseVideos($);
 
       // XHamster typically shows 36 videos per page
@@ -39,7 +33,7 @@ export default class XhamsterProvider implements ContentProvider {
       };
     } catch (error) {
       console.error("Error fetching videos:", error);
-      throw new Error("Failed to fetch videos due to Cloudflare protection");
+      throw new Error("Failed to fetch videos from Xhamster");
     }
   }
 
@@ -93,7 +87,8 @@ export default class XhamsterProvider implements ContentProvider {
         );
 
         // Views
-        const views = this.parseViews($el.find(".video-thumb-views").text().trim());
+        const viewsText = $el.find(".video-thumb-views").text().trim();
+        const views = this.parseViews(viewsText);
 
         // Uploader info
         const $uploaderEl = $el.find(".video-uploader__name");
@@ -141,14 +136,37 @@ export default class XhamsterProvider implements ContentProvider {
   }
 
   private parseViews(text: string): number | undefined {
-    const match = text.match(/(\d+(\.\d+)?)([kM]?)\s*Views/);
+    const match = text.match(/(\d+(\.\d+)?)([kM]?)\s*views/i);
     if (!match) return undefined;
 
     const [, number, , suffix] = match;
     const value = parseFloat(number);
 
-    if (suffix === "k") return value * 1000;
-    if (suffix === "M") return value * 1000000;
-    return value;
+    if (suffix === "k") return Math.round(value * 1000);
+    if (suffix === "M") return Math.round(value * 1000000);
+    return Math.round(value);
+  }
+
+  private async fetchData(url: string): Promise<string> {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    const page = await browser.newPage();
+
+    await page.setRequestInterception(true);
+    page.on("request", (request) => {
+      if (request.resourceType() === "image" || request.resourceType() === "stylesheet") {
+        request.abort();
+      } else {
+        request.continue();
+      }
+    });
+
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+    const content = await page.content();
+    await browser.close();
+
+    return content;
   }
 }

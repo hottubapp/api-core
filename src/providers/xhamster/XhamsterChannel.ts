@@ -25,4 +25,5 @@ export const XHAMSTER_CHANNEL: Channel = {
   ],
   categories: [],
   nsfw: true,
+  ytdlpCommand: "--format all[vcodec^=avc1][ext=mp4]",
 };

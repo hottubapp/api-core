@@ -21,7 +21,7 @@ async function testProvider(name: string, providerClass: any) {
       pagination: { page: 1, limit: 25 },
     });
     console.log(`✓ Found ${searchResults.videos.length} videos`);
-    console.log("Sample video:", JSON.stringify(searchResults.videos[0], null, 2));
+    console.log("Search Results:", JSON.stringify(searchResults.videos, null, 2));
 
     // Test popular/trending
     console.log(`\nTesting ${name} popular...`);
@@ -29,6 +29,7 @@ async function testProvider(name: string, providerClass: any) {
       pagination: { page: 1, limit: 25 },
     });
     console.log(`✓ Found ${popularResults.videos.length} videos`);
+    console.log("Popular Results:", JSON.stringify(popularResults.videos, null, 2));
 
     console.log(`\n${name} tests passed! ✅`);
   } catch (error) {

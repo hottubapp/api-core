@@ -32,4 +32,5 @@ export interface Channel {
   categories: string[];
   options: ChannelOption[];
   nsfw?: boolean;
+  ytdlpCommand?: string;
 }

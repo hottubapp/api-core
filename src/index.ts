@@ -4,6 +4,9 @@ import * as providers from "./providers";
 export * from "./types";
 export * from "./utils";
 
+// get all the default channels from the providers
+const channels = Object.values(providers).map((provider) => new provider().channel);
+
 /**
  * A registry of video providers.
  */
@@ -48,4 +51,4 @@ export class VideoProviderRegistry {
   }
 }
 
-export { providers };
+export { providers, channels };

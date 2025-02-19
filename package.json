@@ -1,6 +1,6 @@
 {
-  "name": "@hottub/api-core",
-  "version": "1.0.0",
+  "name": "@hottubapp/api-core",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -12,9 +12,9 @@
     "prepare": "npm run build"
   },
   "keywords": [],
-  "author": "",
+  "author": "will smillie",
   "license": "ISC",
-  "description": "",
+  "description": "Core extraction logic, models, and types for Hot Tub app servers",
   "devDependencies": {
     "@jest/types": "^29.6.3",
     "@testing-library/jest-dom": "^6.6.3",
@@ -36,6 +36,20 @@
     "cheerio": "^1.0.0",
     "cloudscraper": "^4.6.0",
     "crypto": "^1.0.1",
+    "puppeteer": "^24.2.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "request": "^2.88.2"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hottubapp/api-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hottubapp/api-core/issues"
+  },
+  "homepage": "https://github.com/hottubapp/api-core#readme"
 }
