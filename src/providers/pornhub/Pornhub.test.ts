@@ -63,7 +63,7 @@ describe("PornhubProvider", () => {
       const options: SearchOptions = {
         page: 1,
         // limit: 25,
-        filters: { sort: "recent" },
+        sort: "recent",
       };
 
       await provider.getVideos(options);

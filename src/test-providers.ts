@@ -16,20 +16,15 @@ async function testProvider(name: string, providerClass: any) {
   try {
     // Test search
     console.log("Testing search...");
-    const searchResults = await provider.getVideos({
-      // query: "test",
-      pagination: { page: 1, limit: 25 },
-    });
+    const searchResults = await provider.getVideos({ query: "test", page: 1 });
     console.log(`✓ Found ${searchResults.videos.length} videos`);
-    console.log("Search Results:", JSON.stringify(searchResults.videos, null, 2));
+    console.log("Search Results:", JSON.stringify(searchResults.videos[0], null, 2));
 
     // Test popular/trending
     console.log(`\nTesting ${name} popular...`);
-    const popularResults = await provider.getVideos({
-      pagination: { page: 1, limit: 25 },
-    });
+    const popularResults = await provider.getVideos({ page: 1 });
     console.log(`✓ Found ${popularResults.videos.length} videos`);
-    console.log("Popular Results:", JSON.stringify(popularResults.videos, null, 2));
+    console.log("Popular Results:", JSON.stringify(popularResults.videos[0], null, 2));
 
     console.log(`\n${name} tests passed! ✅`);
   } catch (error) {

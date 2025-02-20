@@ -2,7 +2,7 @@ import { Channel, ChannelStatus } from "@/types";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
-  recent: { id: "recent", title: "Newest", value: "o=cm" },
+  recent: { id: "recent", title: "Newest", value: "o=mr" },
   rating: { id: "rating", title: "Top Rated", value: "o=tr" },
   views: { id: "views", title: "Most Viewed", value: "o=mv" },
   longest: { id: "longest", title: "Longest", value: "o=lg" },

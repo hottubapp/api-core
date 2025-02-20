@@ -74,7 +74,7 @@ describe("XnxxProvider", () => {
         query: "test",
         page: 1,
         // limit: 25,
-        filters: { sort: "rating" },
+        sort: "rating",
       };
 
       mockedAxios.get.mockResolvedValueOnce({

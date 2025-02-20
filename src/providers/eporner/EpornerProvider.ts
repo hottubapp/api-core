@@ -34,34 +34,7 @@ export default class EpornerProvider implements ContentProvider {
   private readonly baseUrl = "https://www.eporner.com/api/v2/video/search/";
   private readonly detailsUrl = "https://www.eporner.com/api/v2/video/id/";
 
-  private validateFilters(filters?: SearchOptions["filters"]): void {
-    if (!filters) return;
-
-    // Validate each filter against channel options
-    Object.entries(filters).forEach(([key, value]) => {
-      const channelOption = this.channel.options.find((opt) => opt.id === key);
-      if (!channelOption) {
-        throw new Error(`Invalid filter: ${key}`);
-      }
-
-      // For array values, check if the option supports multiSelect
-      if (Array.isArray(value) && !channelOption.multiSelect) {
-        throw new Error(`Filter ${key} does not support multiple values`);
-      }
-
-      // Validate value(s) against allowed options
-      const allowedValues = channelOption.options.map((opt) => opt.id);
-      const values = Array.isArray(value) ? value : [value];
-      values.forEach((v) => {
-        if (!allowedValues.includes(v)) {
-          throw new Error(`Invalid value for ${key}: ${v}`);
-        }
-      });
-    });
-  }
-
   public async getVideos(options: SearchOptions): Promise<VideoResult> {
-    this.validateFilters(options.filters);
     const url = this.buildUrl(options);
 
     const response = await axios.get<EpornerApiResponse>(url, {
@@ -94,7 +67,7 @@ export default class EpornerProvider implements ContentProvider {
     params.set("page", String(options?.page || 1));
 
     // Handle sort option
-    const sortValue = options.filters?.sort;
+    const sortValue = options.sort;
     if (typeof sortValue === "string" && this.isSortKey(sortValue)) {
       params.set("order", SORT_OPTIONS[sortValue].value);
     } else {

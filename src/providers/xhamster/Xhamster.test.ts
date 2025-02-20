@@ -54,7 +54,7 @@ describe("XhamsterProvider", () => {
       const options: SearchOptions = {
         query: "test",
         page: 1,
-        filters: { sort: "rating" },
+        sort: "rating",
       };
 
       mockedAxios.get.mockResolvedValueOnce({ data: "" });
@@ -136,7 +136,7 @@ describe("XhamsterProvider", () => {
               <a class="video-thumb-info__name" href="/video${i}/test">Test ${i}</a>
               <div data-testid="video-duration">5:00</div>
             </div>
-          `,
+          `
           ).join("")}
         </div>
       `;
@@ -159,7 +159,7 @@ describe("XhamsterProvider", () => {
               <a class="video-thumb-info__name" href="/video${i}/test">Test ${i}</a>
               <div data-testid="video-duration">5:00</div>
             </div>
-          `,
+          `
           ).join("")}
         </div>
       `;

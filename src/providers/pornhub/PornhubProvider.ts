@@ -14,6 +14,8 @@ export default class PornhubProvider implements ContentProvider {
   public async getVideos(options: SearchOptions): Promise<VideoResult> {
     const url = this.buildUrl(options);
 
+    console.log("🔎 PornhubProvider getVideos", url);
+
     const response = await axios.get(url, {
       headers: {
         Cookie: "accessAgeDisclaimerPH=1;",
@@ -34,6 +36,7 @@ export default class PornhubProvider implements ContentProvider {
   }
 
   private buildUrl(options: SearchOptions): string {
+    const isSearch = !!options?.query?.length;
     const searchPath = options.query ? "video/search" : "video";
     const params = new URLSearchParams();
 
@@ -46,10 +49,17 @@ export default class PornhubProvider implements ContentProvider {
     params.set("page", String(options.page || 1));
 
     // Handle sort option
-    const sortValue = options.filters?.sort;
+    const sortValue = options.sort;
+
     if (typeof sortValue === "string" && sortValue in SORT_OPTIONS) {
-      const [key, value] = SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].value.split("=");
+      let [key, value] = SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].value.split("=");
+
       if (value) {
+        // replace recent wit `cm` when browsing popular
+        if (!isSearch && sortValue == "recent") {
+          value = value.replace("mr", "cm");
+        }
+
         params.set(key, value);
       }
     }

@@ -37,7 +37,7 @@ export default class XnxxProvider implements ContentProvider {
     const pageParam = page > 1 ? `/${page - 1}` : "";
 
     // Handle sort option
-    const sortValue = options.filters?.sort;
+    const sortValue = options.sort;
     const sortParam =
       typeof sortValue === "string" && sortValue in SORT_OPTIONS
         ? SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].value

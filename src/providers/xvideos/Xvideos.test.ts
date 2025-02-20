@@ -67,7 +67,7 @@ describe("XvideosProvider", () => {
         query: "test",
         page: 1,
         // limit: 25,
-        filters: { sort: "rating" },
+        sort: "rating",
       };
 
       mockedAxios.get.mockResolvedValueOnce({
@@ -76,9 +76,7 @@ describe("XvideosProvider", () => {
 
       await provider.getVideos(options);
 
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        "https://www.xvideos.com/?k=test&p=0&sort=rating"
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith("https://www.xvideos.com/?k=test&p=0&sort=rating");
     });
   });
 

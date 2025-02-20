@@ -48,7 +48,7 @@ export default class XhamsterProvider implements ContentProvider {
     params.set("p", String(Math.max(0, page - 1)));
 
     // Handle sort option
-    const sortValue = options.filters?.sort;
+    const sortValue = options.sort;
     if (typeof sortValue === "string" && sortValue in SORT_OPTIONS) {
       params.set(SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].id, "");
     }

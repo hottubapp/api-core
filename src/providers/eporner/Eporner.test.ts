@@ -65,7 +65,7 @@ describe("EpornerProvider", () => {
       const options: SearchOptions = {
         page: 1,
         // limit: 25,
-        filters: { sort: "latest" },
+        sort: "latest",
       };
 
       await provider.getVideos(options);

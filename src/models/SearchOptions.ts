@@ -1,9 +1,10 @@
 export interface SearchFilters {
-  [key: string]: string | string[]; // Dynamic filters based on channel options
+  [key: string]: undefined | number | string | string[]; // Dynamic filters based on channel options
 }
 
-export interface SearchOptions {
+interface BaseSearchOptions {
   query?: string;
-  filters?: SearchFilters;
   page: number;
 }
+
+export interface SearchOptions extends BaseSearchOptions, SearchFilters {}
