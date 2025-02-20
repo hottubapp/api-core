@@ -14,6 +14,8 @@ export default class XvideosProvider implements ContentProvider {
   public async getVideos(options: SearchOptions): Promise<VideoResult> {
     const url = this.buildUrl(options);
 
+    console.log("XVideos url", url);
+
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
     const videos = this.parseVideos($);
@@ -34,7 +36,7 @@ export default class XvideosProvider implements ContentProvider {
     }
 
     const page = options?.page || 1;
-    const pageParam = `p=${Math.max(0, page - 1)}`;
+    const pageParam = `p=${page}`;
 
     // Handle sort option
     const sortValue = options.sort;
@@ -48,7 +50,8 @@ export default class XvideosProvider implements ContentProvider {
 
   private buildPopularUrl(options: SearchOptions): string {
     const page = options?.page || 1;
-    return `${this.baseUrl}/new/${page}`;
+    let path = options.sort == "new" ? "new" : "best";
+    return `${this.baseUrl}/${path}/${page}`;
   }
 
   private parseVideos($: CheerioAPI): Video[] {
@@ -82,21 +85,8 @@ export default class XvideosProvider implements ContentProvider {
         const duration = this.parseDuration(durationText);
 
         // Views - extract from metadata text
-        let views: number | undefined;
         const viewsText = $metadata.text();
-        // Match formats like "13 minMydirtyhobby - 2.6M Views -" or "8 minMYLF Official - 29M Views -"
-        const viewsMatch = viewsText.match(/\s*-\s*(\d+\.?\d*)[kM]\s*Views/);
-
-        if (viewsMatch) {
-          const [, number] = viewsMatch;
-          const value = parseFloat(number);
-
-          if (viewsText.includes("M Views")) {
-            views = value * 1000000;
-          } else if (viewsText.includes("k Views")) {
-            views = value * 1000;
-          }
-        }
+        const views = this.parseViews(viewsText);
 
         results.push(
           new Video({
@@ -122,10 +112,18 @@ export default class XvideosProvider implements ContentProvider {
 
   private parseDuration(duration: string): number {
     const parts = duration.split(" ");
-    if (parts[1] === "min") {
-      return parseInt(parts[0], 10) * 60;
+    let totalSeconds = 0;
+
+    for (let i = 0; i < parts.length; i += 2) {
+      const value = parseInt(parts[i], 10);
+      if (parts[i + 1] === "h") {
+        totalSeconds += value * 3600; // Convert hours to seconds
+      } else if (parts[i + 1] === "min") {
+        totalSeconds += value * 60; // Convert minutes to seconds
+      }
     }
-    return 0;
+
+    return totalSeconds;
   }
 
   private parseViews(text: string): number | undefined {
@@ -137,6 +135,7 @@ export default class XvideosProvider implements ContentProvider {
 
     if (suffix === "k") return value * 1000;
     if (suffix === "M") return value * 1000000;
+
     return value;
   }
 }

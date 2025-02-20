@@ -13,6 +13,7 @@ export default class XnxxProvider implements ContentProvider {
 
   public async getVideos(options: SearchOptions): Promise<VideoResult> {
     const url = this.buildUrl(options);
+    console.log("XNXX url", url);
 
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
@@ -29,42 +30,47 @@ export default class XnxxProvider implements ContentProvider {
   }
 
   private buildUrl(options: SearchOptions): string {
-    if (!options.query) {
-      return this.buildPopularUrl(options);
-    }
-
-    const page = options?.page || 1;
-    const pageParam = page > 1 ? `/${page - 1}` : "";
-
-    // Handle sort option
+    const page = options?.page || 1; // Default to page 1
     const sortValue = options.sort;
-    const sortParam =
-      typeof sortValue === "string" && sortValue in SORT_OPTIONS
-        ? SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].value
-        : "";
+    const value = SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS]?.value;
 
-    return `${this.baseUrl}/search/${encodeURIComponent(options.query)}${pageParam}${sortParam ? "?" + sortParam : ""}`;
-  }
+    // Construct the URL based on the sort option
+    let url = "";
 
-  private buildPopularUrl(options: SearchOptions): string {
-    const date = new Date();
-    let year = date.getFullYear();
-    const page = options.page || 1;
-    let monthOffset = date.getMonth() + 1 - (page - 1);
-
-    // If it's the first of the month, use previous month
-    if (date.getDate() === 1) {
-      monthOffset--;
+    switch (sortValue) {
+      case "relevance":
+        url =
+          (options.query ? `${this.baseUrl}/search/${encodeURIComponent(options.query)}` : `${this.baseUrl}/best`) +
+          (page > 1 ? "/" + page : ""); // No query, just base URL
+        break;
+      case "best":
+        url =
+          (options.query
+            ? `${this.baseUrl}/search/hits/${encodeURIComponent(options.query)}`
+            : `${this.baseUrl}/hits`) + (page > 1 ? "/" + page : ""); // No query, just hits
+        break;
+      case "recent":
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        url =
+          (options.query
+            ? `${this.baseUrl}/search/month/${encodeURIComponent(options.query)}`
+            : `${this.baseUrl}/search/month`) + (page > 1 ? "/" + page : ""); // No query needed for recent
+        break;
+      case "duration":
+        url =
+          (options.query
+            ? `${this.baseUrl}/search/${value}/${encodeURIComponent(options.query)}`
+            : `${this.baseUrl}/search/${value}`) + (page > 1 ? "/" + page : ""); // Include query if present
+        break;
+      default:
+        url =
+          (options.query ? `${this.baseUrl}/search/${encodeURIComponent(options.query)}` : `${this.baseUrl}/best`) +
+          (page > 1 ? "/" + page : ""); // Fallback to base URL
     }
 
-    // Adjust year when months go negative
-    while (monthOffset <= 0) {
-      year--;
-      monthOffset += 12;
-    }
-
-    const month = monthOffset.toString().padStart(2, "0");
-    return `${this.baseUrl}/best/${year}-${month}`;
+    return url;
   }
 
   private parseVideos($: CheerioAPI): Video[] {

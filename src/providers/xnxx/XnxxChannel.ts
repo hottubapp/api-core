@@ -2,10 +2,9 @@ import { Channel, ChannelStatus } from "@/types";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
-  recent: { id: "recent", title: "Newest", value: "sort=uploaddate" },
-  rating: { id: "rating", title: "Top Rated", value: "sort=rating" },
-  views: { id: "views", title: "Most Viewed", value: "sort=views" },
-  duration: { id: "duration", title: "Longest", value: "sort=length" },
+  best: { id: "best", title: "Best", value: "hits" },
+  recent: { id: "recent", title: "Recent", value: "recent" },
+  duration: { id: "duration", title: "Longest", value: "20min+" },
 } as const;
 
 export const XNXX_CHANNEL: Channel = {
