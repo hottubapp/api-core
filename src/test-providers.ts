@@ -1,6 +1,6 @@
-import { VideoProviderRegistry } from "./index";
+import { VideoProviderRegistry, providers as allProviders } from "./index";
 
-const registry = new VideoProviderRegistry();
+const registry = new VideoProviderRegistry({ ...allProviders });
 const providers = registry.providers;
 
 async function testProvider(name: string, providerClass: any) {
@@ -16,15 +16,15 @@ async function testProvider(name: string, providerClass: any) {
   try {
     // Test search
     console.log("Testing search...");
-    const searchResults = await provider.getVideos({ query: "test", page: 1 });
-    console.log(`✓ Found ${searchResults.videos.length} videos`);
-    console.log("Search Results:", JSON.stringify(searchResults.videos[0], null, 2));
+    const searchResults = await registry.getVideos(name, { query: "test", page: 1 });
+    console.log(`✓ Found ${searchResults.items.length} videos`);
+    console.log("Search Results:", JSON.stringify(searchResults.items[0], null, 2));
 
     // Test popular/trending
     console.log(`\nTesting ${name} popular...`);
-    const popularResults = await provider.getVideos({ page: 1 });
-    console.log(`✓ Found ${popularResults.videos.length} videos`);
-    console.log("Popular Results:", JSON.stringify(popularResults.videos[0], null, 2));
+    const popularResults = await registry.getVideos(name, { page: 1 });
+    console.log(`✓ Found ${popularResults.items.length} videos`);
+    console.log("Popular Results:", JSON.stringify(popularResults.items[0], null, 2));
 
     console.log(`\n${name} tests passed! ✅`);
   } catch (error) {
@@ -33,9 +33,19 @@ async function testProvider(name: string, providerClass: any) {
 }
 
 async function main(providerName?: string) {
+  var provider: any = null;
+  if (providerName) {
+    provider = providers[providerName as keyof typeof providers];
+  }
+
+  if (!provider && providerName) {
+    console.error(`❌ Provider ${providerName} not found`);
+    return;
+  }
+
   // If a specific provider is provided, test that provider
-  if (providerName && providers[providerName as keyof typeof providers]) {
-    await testProvider(providerName as keyof typeof providers, providers[providerName as keyof typeof providers]);
+  if (providerName && provider) {
+    await testProvider(providerName as keyof typeof providers, provider);
   } else {
     for (const [name, provider] of Object.entries(providers)) {
       await testProvider(name, provider);

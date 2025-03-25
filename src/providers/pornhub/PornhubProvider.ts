@@ -1,22 +1,18 @@
-import axios from "axios";
-
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
-import { ContentProvider, VideoResult } from "@/types";
-import { Video } from "@/models/Video";
-import { SearchOptions } from "@/models/SearchOptions";
+import { ContentProvider, VideosResponse, VideosRequest, Video, createAxiosInstanceWithProxy } from "@hottubapp/core";
 import { PORNHUB_CHANNEL, SORT_OPTIONS } from "./PornhubChannel";
-
 export default class PornhubProvider implements ContentProvider {
   readonly channel = PORNHUB_CHANNEL;
   private readonly baseUrl = "https://www.pornhub.com";
 
-  public async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: VideosRequest): Promise<VideosResponse> {
     const url = this.buildUrl(options);
 
     console.log("🔎 PornhubProvider getVideos", url);
 
-    const response = await axios.get(url, {
+    const axiosInstance = await createAxiosInstanceWithProxy(options.proxy);
+    const response = await axiosInstance.get(url, {
       headers: {
         Cookie: "accessAgeDisclaimerPH=1;",
       },
@@ -29,13 +25,12 @@ export default class PornhubProvider implements ContentProvider {
     const itemsPerPage = 25;
 
     return {
-      videos,
-      totalResults,
-      hasNextPage: currentPage * itemsPerPage < totalResults,
+      items: videos,
+      pageInfo: { hasNextPage: currentPage * itemsPerPage < totalResults },
     };
   }
 
-  private buildUrl(options: SearchOptions): string {
+  private buildUrl(options: VideosRequest): string {
     const isSearch = !!options?.query?.length;
     const searchPath = options.query ? "video/search" : "video";
     const params = new URLSearchParams();
@@ -83,7 +78,7 @@ export default class PornhubProvider implements ContentProvider {
 
       results.push(
         new Video({
-          displayId: url.split("/").pop()?.split("?")[0] || "",
+          displayId: url.match(/viewkey=([^&]+)/)?.[1] || "",
           title: $el.find(".title").text().trim(),
           url: `https://pornhub.com${url}`,
           duration: this.parseDuration($el.find(".duration").text()),
@@ -94,7 +89,7 @@ export default class PornhubProvider implements ContentProvider {
           uploader,
           uploaderUrl: uploaderUrl ? `https://pornhub.com${uploaderUrl}` : undefined,
           verified,
-        })
+        }),
       );
     });
 
@@ -123,10 +118,10 @@ export default class PornhubProvider implements ContentProvider {
     const multiplier = number.includes("K")
       ? 1000
       : number.includes("M")
-      ? 1000000
-      : number.includes("B")
-      ? 1000000000
-      : 1;
+        ? 1000000
+        : number.includes("B")
+          ? 1000000000
+          : 1;
     return parseFloat(number) * multiplier;
   }
 }

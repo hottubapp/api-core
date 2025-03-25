@@ -1,4 +1,4 @@
-import { Channel, ChannelStatus } from "@/types/channel";
+import { Channel, ChannelStatus, ChannelOption } from "@hottubapp/core";
 
 export const SORT_OPTIONS = {
   popular: { id: "popular", title: "Popular", value: "popular" },
@@ -22,9 +22,10 @@ export const EPORNER_CHANNEL: Channel = {
       title: "Sort",
       systemImage: "list.number",
       colorName: "indigo",
-      options: Object.values(SORT_OPTIONS).map(({ id, title }) => ({ id, title })),
+      options: Object.values(SORT_OPTIONS) as ChannelOption[],
     },
   ],
   categories: [],
   nsfw: true,
+  ytdlpCommand: "--format all[ext=mp4][vcodec!*=av1]",
 };

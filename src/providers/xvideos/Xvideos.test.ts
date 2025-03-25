@@ -1,6 +1,5 @@
 import axios from "axios";
-
-import { SearchOptions } from "@/models/SearchOptions";
+import { VideosRequest } from "@hottubapp/core";
 import XvideosProvider from "./XvideosProvider";
 
 jest.mock("axios");
@@ -16,7 +15,7 @@ describe("XvideosProvider", () => {
 
   describe("URL building", () => {
     it("builds search URL with query", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test search",
         page: 1,
         // limit: 25,
@@ -32,7 +31,7 @@ describe("XvideosProvider", () => {
     });
 
     it("includes page number in search URL", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test",
         page: 3,
         // limit: 25,
@@ -48,7 +47,7 @@ describe("XvideosProvider", () => {
     });
 
     it("builds popular URL correctly", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 2,
         // limit: 25,
       };
@@ -63,7 +62,7 @@ describe("XvideosProvider", () => {
     });
 
     it("handles different sort options", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test",
         page: 1,
         // limit: 25,
@@ -115,7 +114,7 @@ describe("XvideosProvider", () => {
         // limit: 25,
       });
 
-      const video = result.videos[0];
+      const video = result.items[0];
       expect(video).toMatchObject({
         id: expect.any(String),
         displayId: "test_video",
@@ -159,10 +158,10 @@ describe("XvideosProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos[0].views).toBeUndefined();
-      expect(result.videos[0].uploader).toBeUndefined();
-      expect(result.videos[0].uploaderUrl).toBeUndefined();
-      expect(result.videos[0].verified).toBe(false);
+      expect(result.items[0].views).toBeUndefined();
+      expect(result.items[0].uploader).toBeUndefined();
+      expect(result.items[0].uploaderUrl).toBeUndefined();
+      expect(result.items[0].verified).toBe(false);
     });
 
     it("determines hasNextPage based on video count", async () => {
@@ -185,7 +184,7 @@ describe("XvideosProvider", () => {
                 </div>
                 <span class="duration">5 min</span>
               </div>
-            `
+            `,
             ).join("")}
           </div>
         </div>
@@ -198,7 +197,7 @@ describe("XvideosProvider", () => {
         // limit: 25,
       });
 
-      expect(result.hasNextPage).toBe(true);
+      expect(result.pageInfo?.hasNextPage).toBe(true);
 
       // Test with less than 32 videos (last page)
       const lastPageHtml = `
@@ -219,7 +218,7 @@ describe("XvideosProvider", () => {
                 </div>
                 <span class="duration">5 min</span>
               </div>
-            `
+            `,
             ).join("")}
           </div>
         </div>
@@ -232,7 +231,7 @@ describe("XvideosProvider", () => {
         // limit: 25,
       });
 
-      expect(result.hasNextPage).toBe(false);
+      expect(result.pageInfo?.hasNextPage).toBe(false);
     });
   });
 
@@ -244,7 +243,7 @@ describe("XvideosProvider", () => {
         provider.getVideos({
           page: 1,
           // limit: 25,
-        })
+        }),
       ).rejects.toThrow("Network Error");
     });
 
@@ -256,7 +255,7 @@ describe("XvideosProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos).toEqual([]);
+      expect(result.items).toEqual([]);
     });
   });
 });

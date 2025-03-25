@@ -1,6 +1,5 @@
 import axios from "axios";
-
-import { SearchOptions } from "@/models/SearchOptions";
+import { VideosRequest } from "@hottubapp/core";
 import XnxxProvider from "./XnxxProvider";
 
 jest.mock("axios");
@@ -16,7 +15,7 @@ describe("XnxxProvider", () => {
 
   describe("URL building", () => {
     it("builds search URL with query", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test search",
         page: 1,
         // limit: 25,
@@ -32,7 +31,7 @@ describe("XnxxProvider", () => {
     });
 
     it("includes page number in search URL", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test",
         page: 3,
         // limit: 25,
@@ -48,7 +47,7 @@ describe("XnxxProvider", () => {
     });
 
     it("builds popular URL with correct month", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 1,
         // limit: 25,
       };
@@ -70,7 +69,7 @@ describe("XnxxProvider", () => {
     });
 
     it("handles different sort options", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test",
         page: 1,
         // limit: 25,
@@ -122,7 +121,7 @@ describe("XnxxProvider", () => {
         // limit: 25,
       });
 
-      const video = result.videos[0];
+      const video = result.items[0];
       expect(video).toMatchObject({
         id: expect.any(String),
         displayId: "123456",
@@ -163,10 +162,10 @@ describe("XnxxProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos[0].views).toBeUndefined();
-      expect(result.videos[0].rating).toBeUndefined();
-      expect(result.videos[0].uploader).toBeUndefined();
-      expect(result.videos[0].uploaderUrl).toBeUndefined();
+      expect(result.items[0].views).toBeUndefined();
+      expect(result.items[0].rating).toBeUndefined();
+      expect(result.items[0].uploader).toBeUndefined();
+      expect(result.items[0].uploaderUrl).toBeUndefined();
     });
   });
 
@@ -178,7 +177,7 @@ describe("XnxxProvider", () => {
         provider.getVideos({
           page: 1,
           // limit: 25,
-        })
+        }),
       ).rejects.toThrow("Network Error");
     });
 
@@ -190,7 +189,7 @@ describe("XnxxProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos).toEqual([]);
+      expect(result.items).toEqual([]);
     });
   });
 });

@@ -1,6 +1,5 @@
 import axios from "axios";
-
-import { SearchOptions } from "@/models/SearchOptions";
+import { VideosRequest } from "@hottubapp/core";
 import XhamsterProvider from "./XhamsterProvider";
 
 jest.mock("axios");
@@ -16,7 +15,7 @@ describe("XhamsterProvider", () => {
 
   describe("URL building", () => {
     it("builds search URL with query", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test search",
         page: 1,
       };
@@ -28,7 +27,7 @@ describe("XhamsterProvider", () => {
     });
 
     it("includes page number in search URL", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test",
         page: 3,
       };
@@ -40,7 +39,7 @@ describe("XhamsterProvider", () => {
     });
 
     it("builds popular URL correctly", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 2,
       };
 
@@ -51,7 +50,7 @@ describe("XhamsterProvider", () => {
     });
 
     it("handles different sort options", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test",
         page: 1,
         sort: "rating",
@@ -84,7 +83,7 @@ describe("XhamsterProvider", () => {
 
       const result = await provider.getVideos({ page: 1 });
 
-      const video = result.videos[0];
+      const video = result.items[0];
       expect(video).toMatchObject({
         displayId: "test_video",
         title: "Test Video Title",
@@ -116,10 +115,10 @@ describe("XhamsterProvider", () => {
 
       const result = await provider.getVideos({ page: 1 });
 
-      expect(result.videos[0].views).toBeUndefined();
-      expect(result.videos[0].uploader).toBeUndefined();
-      expect(result.videos[0].uploaderUrl).toBeUndefined();
-      expect(result.videos[0].verified).toBe(false);
+      expect(result.items[0].views).toBeUndefined();
+      expect(result.items[0].uploader).toBeUndefined();
+      expect(result.items[0].uploaderUrl).toBeUndefined();
+      expect(result.items[0].verified).toBe(false);
     });
 
     it("determines hasNextPage based on video count", async () => {
@@ -136,7 +135,7 @@ describe("XhamsterProvider", () => {
               <a class="video-thumb-info__name" href="/video${i}/test">Test ${i}</a>
               <div data-testid="video-duration">5:00</div>
             </div>
-          `
+          `,
           ).join("")}
         </div>
       `;
@@ -144,7 +143,7 @@ describe("XhamsterProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: fullPageHtml });
 
       let result = await provider.getVideos({ page: 1 });
-      expect(result.hasNextPage).toBe(true);
+      expect(result.pageInfo?.hasNextPage).toBe(true);
 
       // Test with less than 36 videos (last page)
       const lastPageHtml = `
@@ -159,7 +158,7 @@ describe("XhamsterProvider", () => {
               <a class="video-thumb-info__name" href="/video${i}/test">Test ${i}</a>
               <div data-testid="video-duration">5:00</div>
             </div>
-          `
+          `,
           ).join("")}
         </div>
       `;
@@ -167,7 +166,7 @@ describe("XhamsterProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: lastPageHtml });
 
       result = await provider.getVideos({ page: 1 });
-      expect(result.hasNextPage).toBe(false);
+      expect(result.pageInfo?.hasNextPage).toBe(false);
     });
   });
 
@@ -182,7 +181,7 @@ describe("XhamsterProvider", () => {
       mockedAxios.get.mockResolvedValueOnce({ data: "Invalid HTML" });
 
       const result = await provider.getVideos({ page: 1 });
-      expect(result.videos).toEqual([]);
+      expect(result.items).toEqual([]);
     });
   });
 });

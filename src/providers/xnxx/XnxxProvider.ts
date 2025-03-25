@@ -1,21 +1,16 @@
-import axios from "axios";
-
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
-import { ContentProvider, VideoResult } from "@/types";
-import { Video } from "@/models/Video";
-import { SearchOptions } from "@/models/SearchOptions";
+import { ContentProvider, VideosResponse, VideosRequest, Video, createAxiosInstanceWithProxy } from "@hottubapp/core";
 import { XNXX_CHANNEL, SORT_OPTIONS } from "./XnxxChannel";
 
 export default class XnxxProvider implements ContentProvider {
   readonly channel = XNXX_CHANNEL;
   private readonly baseUrl = "https://www.xnxx.com";
 
-  public async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: VideosRequest): Promise<VideosResponse> {
     const url = this.buildUrl(options);
-    console.log("XNXX url", url);
-
-    const response = await axios.get(url);
+    console.log("🔎 [XnxxProvider] url", url);
+    const response = await createAxiosInstanceWithProxy(options.proxy).get(url);
     const $ = cheerio.load(response.data);
     const videos = this.parseVideos($);
 
@@ -23,13 +18,24 @@ export default class XnxxProvider implements ContentProvider {
     const hasMore = $("#content .mozaique .thumb-block").length === 32;
 
     return {
-      videos,
-      totalResults: -1, // XNXX doesn't provide total count
-      hasNextPage: hasMore,
+      items: videos,
+      pageInfo: { hasNextPage: hasMore },
     };
   }
 
-  private buildUrl(options: SearchOptions): string {
+  private getPreviousMonth(): string {
+    const date = new Date();
+    // Set to previous month by subtracting 1 month
+    date.setMonth(date.getMonth() - 1);
+
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // getMonth() returns 0-11
+    const formattedMonth = month.toString().padStart(2, "0");
+
+    return `${year}-${formattedMonth}`;
+  }
+
+  private buildUrl(options: VideosRequest): string {
     const page = options?.page || 1; // Default to page 1
     const sortValue = options.sort;
     const value = SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS]?.value;
@@ -40,8 +46,9 @@ export default class XnxxProvider implements ContentProvider {
     switch (sortValue) {
       case "relevance":
         url =
-          (options.query ? `${this.baseUrl}/search/${encodeURIComponent(options.query)}` : `${this.baseUrl}/best`) +
-          (page > 1 ? "/" + page : ""); // No query, just base URL
+          (options.query
+            ? `${this.baseUrl}/search/${encodeURIComponent(options.query)}`
+            : `${this.baseUrl}/best/${this.getPreviousMonth()}`) + (page > 1 ? "/" + page : ""); // No query, just base URL
         break;
       case "best":
         url =
@@ -50,9 +57,6 @@ export default class XnxxProvider implements ContentProvider {
             : `${this.baseUrl}/hits`) + (page > 1 ? "/" + page : ""); // No query, just hits
         break;
       case "recent":
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
         url =
           (options.query
             ? `${this.baseUrl}/search/month/${encodeURIComponent(options.query)}`
@@ -66,8 +70,9 @@ export default class XnxxProvider implements ContentProvider {
         break;
       default:
         url =
-          (options.query ? `${this.baseUrl}/search/${encodeURIComponent(options.query)}` : `${this.baseUrl}/best`) +
-          (page > 1 ? "/" + page : ""); // Fallback to base URL
+          (options.query
+            ? `${this.baseUrl}/search/${encodeURIComponent(options.query)}`
+            : `${this.baseUrl}/best/${this.getPreviousMonth()}`) + (page > 1 ? "/" + page : ""); // Fallback to base URL
     }
 
     return url;
@@ -117,7 +122,7 @@ export default class XnxxProvider implements ContentProvider {
             thumb,
             uploader: uploader || undefined,
             uploaderUrl: uploaderUrl ? `${this.baseUrl}${uploaderUrl}` : undefined,
-          })
+          }),
         );
       } catch (error) {
         console.warn("Error parsing video:", error);

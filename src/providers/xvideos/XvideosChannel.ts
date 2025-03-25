@@ -1,4 +1,4 @@
-import { Channel, ChannelStatus } from "@/types";
+import { Channel, ChannelOption, ChannelStatus, ChannelOptionChoice } from "@hottubapp/core";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
@@ -14,6 +14,7 @@ export const XVIDEOS_CHANNEL: Channel = {
   name: "XVideos",
   description: "The best free porn videos on internet.",
   favicon: "https://www.google.com/s2/favicons?sz=64&domain=xvideos.com",
+  // favicon: "https://cdn.hottubapp.io/assets/channels/redx.png",
   status: ChannelStatus.Active,
   options: [
     {
@@ -21,8 +22,8 @@ export const XVIDEOS_CHANNEL: Channel = {
       title: "Sort",
       systemImage: "list.number",
       colorName: "indigo",
-      options: Object.values(SORT_OPTIONS).map(({ id, title }) => ({ id, title })),
+      options: Object.values(SORT_OPTIONS) as ChannelOptionChoice[],
     },
-  ],
+  ] as ChannelOption[],
   categories: [],
 };

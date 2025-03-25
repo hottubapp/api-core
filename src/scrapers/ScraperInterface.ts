@@ -1,12 +1,10 @@
-import { Video } from "../models/Video";
-import { SearchOptions } from "../models/SearchOptions";
-import { VideoResult } from "../types/provider";
+import { Video, VideosRequest, VideosResponse } from "@hottubapp/core";
 
 export interface Scraper {
   name: string;
 
   // Core methods
-  getVideos(options: SearchOptions): Promise<VideoResult>;
+  getVideos(options: VideosRequest): Promise<VideosResponse>;
 
   // Optional methods
   getVideoDetails?(videoId: string): Promise<Video>;

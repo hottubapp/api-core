@@ -1,10 +1,11 @@
-import { Channel, ChannelStatus } from "@/types";
+import { Channel, ChannelStatus, ChannelOption } from "@hottubapp/core";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
-  best: { id: "best", title: "Best", value: "hits" },
-  recent: { id: "recent", title: "Recent", value: "recent" },
-  duration: { id: "duration", title: "Longest", value: "20min+" },
+  recent: { id: "recent", title: "Newest", value: "sort=uploaddate" },
+  rating: { id: "rating", title: "Top Rated", value: "sort=rating" },
+  views: { id: "views", title: "Most Viewed", value: "sort=views" },
+  duration: { id: "duration", title: "Longest", value: "sort=length" },
 } as const;
 
 export const XNXX_CHANNEL: Channel = {
@@ -12,6 +13,7 @@ export const XNXX_CHANNEL: Channel = {
   name: "XNXX",
   description: "XNXX delivers free sex movies and fast free porn videos (tube porn).",
   favicon: "https://www.google.com/s2/favicons?sz=64&domain=xnxx.com",
+  // favicon: "https://cdn.hottubapp.io/assets/channels/bluex.png",
   status: ChannelStatus.Active,
   options: [
     {
@@ -19,7 +21,7 @@ export const XNXX_CHANNEL: Channel = {
       title: "Sort",
       systemImage: "list.number",
       colorName: "indigo",
-      options: Object.values(SORT_OPTIONS).map(({ id, title }) => ({ id, title })),
+      options: Object.values(SORT_OPTIONS) as ChannelOption[],
     },
   ],
   categories: [],

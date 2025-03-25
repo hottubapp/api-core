@@ -1,6 +1,5 @@
 import axios from "axios";
-
-import { SearchOptions } from "@/models/SearchOptions";
+import { VideosRequest } from "@hottubapp/core";
 import PornhubProvider from "./PornhubProvider";
 
 // Mock axios
@@ -25,7 +24,7 @@ describe("PornhubProvider", () => {
 
   describe("URL building", () => {
     it("builds basic search URL with defaults", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 1,
         // limit: 25,
       };
@@ -34,7 +33,7 @@ describe("PornhubProvider", () => {
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringContaining("https://www.pornhub.com/video"),
-        expect.any(Object)
+        expect.any(Object),
       );
 
       const url = mockedAxios.get.mock.calls[0][0];
@@ -44,7 +43,7 @@ describe("PornhubProvider", () => {
     });
 
     it("includes search query when provided", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test search",
         page: 1,
         // limit: 25,
@@ -60,7 +59,7 @@ describe("PornhubProvider", () => {
     });
 
     it("handles different sort options", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 1,
         // limit: 25,
         sort: "recent",
@@ -107,7 +106,7 @@ describe("PornhubProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos[0]).toEqual({
+      expect(result.items[0]).toEqual({
         id: expect.any(String),
         displayId: "123",
         hashedUrl: expect.any(String),
@@ -123,8 +122,7 @@ describe("PornhubProvider", () => {
         verified: true,
       });
 
-      expect(result.totalResults).toBe(1234);
-      expect(result.hasNextPage).toBe(true);
+      expect(result.pageInfo?.hasNextPage).toBe(true);
     });
 
     it("handles missing optional fields", async () => {
@@ -152,8 +150,8 @@ describe("PornhubProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos[0].preview).toBeUndefined();
-      expect(result.videos[0].verified).toBe(false);
+      expect(result.items[0].preview).toBeUndefined();
+      expect(result.items[0].verified).toBe(false);
     });
 
     it("correctly determines hasNextPage", async () => {
@@ -172,7 +170,7 @@ describe("PornhubProvider", () => {
         // limit: 25,
       });
 
-      expect(result.hasNextPage).toBe(true);
+      expect(result.pageInfo?.hasNextPage).toBe(true);
 
       // Test case 2: No next page (total <= current page * items per page)
       mockedAxios.get.mockResolvedValueOnce({
@@ -189,7 +187,7 @@ describe("PornhubProvider", () => {
         // limit: 25,
       });
 
-      expect(result.hasNextPage).toBe(false);
+      expect(result.pageInfo?.hasNextPage).toBe(false);
     });
   });
 
@@ -201,7 +199,7 @@ describe("PornhubProvider", () => {
         provider.getVideos({
           page: 1,
           // limit: 25,
-        })
+        }),
       ).rejects.toThrow("Network Error");
     });
   });

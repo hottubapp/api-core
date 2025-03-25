@@ -1,6 +1,5 @@
 import axios from "axios";
-
-import { SearchOptions } from "@/models/SearchOptions";
+import { VideosRequest } from "@hottubapp/core";
 import EpornerProvider from "./EpornerProvider";
 
 // Mock axios
@@ -26,7 +25,7 @@ describe("EpornerProvider", () => {
 
   describe("URL building", () => {
     it("builds basic search URL with defaults", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 1,
         // limit: 25,
       };
@@ -35,7 +34,7 @@ describe("EpornerProvider", () => {
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringContaining("https://www.eporner.com/api/v2/video/search/"),
-        expect.any(Object)
+        expect.any(Object),
       );
 
       const url = mockedAxios.get.mock.calls[0][0];
@@ -48,7 +47,7 @@ describe("EpornerProvider", () => {
     });
 
     it("includes search query when provided", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         query: "test search",
         page: 1,
         // limit: 25,
@@ -62,7 +61,7 @@ describe("EpornerProvider", () => {
     });
 
     it("handles different sort options", async () => {
-      const options: SearchOptions = {
+      const options: VideosRequest = {
         page: 1,
         // limit: 25,
         sort: "latest",
@@ -109,7 +108,7 @@ describe("EpornerProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos[0]).toEqual({
+      expect(result.items[0]).toEqual({
         id: expect.any(String),
         displayId: "123",
         hashedUrl: expect.any(String),
@@ -159,8 +158,8 @@ describe("EpornerProvider", () => {
         // limit: 25,
       });
 
-      expect(result.videos[0].rating).toBeUndefined();
-      expect(result.videos[0].tags).toEqual([]);
+      expect(result.items[0].rating).toBeUndefined();
+      expect(result.items[0].tags).toEqual([]);
     });
 
     it("correctly determines hasNextPage", async () => {
@@ -178,7 +177,7 @@ describe("EpornerProvider", () => {
         // limit: 25,
       });
 
-      expect(result.hasNextPage).toBe(true);
+      expect(result.pageInfo?.hasNextPage).toBe(true);
 
       // Test case 2: No next page
       mockedAxios.get.mockResolvedValueOnce({
@@ -194,7 +193,7 @@ describe("EpornerProvider", () => {
         // limit: 25,
       });
 
-      expect(result.hasNextPage).toBe(false);
+      expect(result.pageInfo?.hasNextPage).toBe(false);
     });
   });
 
@@ -206,7 +205,7 @@ describe("EpornerProvider", () => {
         provider.getVideos({
           page: 1,
           // limit: 25,
-        })
+        }),
       ).rejects.toThrow("API Error");
     });
   });

@@ -1,8 +1,5 @@
 import axios from "axios";
-
-import type { ContentProvider, VideoResult } from "@/types";
-import { Video } from "@/models/Video";
-import { SearchOptions } from "@/models/SearchOptions";
+import { ContentProvider, VideosResponse, VideosRequest, Video, createAxiosInstanceWithProxy } from "@hottubapp/core";
 import { EPORNER_CHANNEL, SORT_OPTIONS } from "./EpornerChannel";
 
 type SortKey = keyof typeof SORT_OPTIONS;
@@ -34,23 +31,20 @@ export default class EpornerProvider implements ContentProvider {
   private readonly baseUrl = "https://www.eporner.com/api/v2/video/search/";
   private readonly detailsUrl = "https://www.eporner.com/api/v2/video/id/";
 
-  public async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: VideosRequest): Promise<VideosResponse> {
     const url = this.buildUrl(options);
 
-    const response = await axios.get<EpornerApiResponse>(url, {
-      headers: {
-        Cookie: "parental-control=yes;",
-      },
-    });
+    const axiosInstance = await createAxiosInstanceWithProxy(options.proxy);
+    const response = await axiosInstance.get<EpornerApiResponse>(url);
+    const parsedVideos = this.parseVideos(response.data.videos);
 
     return {
-      videos: this.parseVideos(response.data.videos),
-      totalResults: response.data.total,
-      hasNextPage: response.data.page * 25 < response.data.total,
+      items: parsedVideos,
+      pageInfo: { hasNextPage: response.data.page * 25 < response.data.total },
     };
   }
 
-  private buildUrl(options: SearchOptions): string {
+  private buildUrl(options: VideosRequest): string {
     const params = new URLSearchParams({
       format: "json",
       per_page: "25",
@@ -104,7 +98,7 @@ export default class EpornerProvider implements ContentProvider {
           uploaderId: undefined,
           aspectRatio: undefined,
           performers: undefined,
-        })
+        }),
     );
   }
 

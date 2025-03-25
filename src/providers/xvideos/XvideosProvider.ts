@@ -1,22 +1,18 @@
-import axios from "axios";
-
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
-import { ContentProvider, VideoResult } from "@/types";
-import { Video } from "@/models/Video";
-import { SearchOptions } from "@/models/SearchOptions";
+import { ContentProvider, VideosResponse, VideosRequest, createAxiosInstanceWithProxy, Video } from "@hottubapp/core";
 import { XVIDEOS_CHANNEL, SORT_OPTIONS } from "./XvideosChannel";
 
 export default class XvideosProvider implements ContentProvider {
   readonly channel = XVIDEOS_CHANNEL;
   private readonly baseUrl = "https://www.xvideos.com";
 
-  public async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: VideosRequest): Promise<VideosResponse> {
     const url = this.buildUrl(options);
 
-    console.log("XVideos url", url);
-
-    const response = await axios.get(url);
+    // console.log("🔎 [XvideosProvider] url", url);
+    const axiosInstance = await createAxiosInstanceWithProxy(options.proxy);
+    const response = await axiosInstance.get(url);
     const $ = cheerio.load(response.data);
     const videos = this.parseVideos($);
 
@@ -24,13 +20,12 @@ export default class XvideosProvider implements ContentProvider {
     const hasMore = $("#content .mozaique .thumb-block").length === 32;
 
     return {
-      videos,
-      totalResults: -1, // XVideos doesn't provide total count
-      hasNextPage: hasMore,
+      items: videos,
+      pageInfo: { hasNextPage: hasMore },
     };
   }
 
-  private buildUrl(options: SearchOptions): string {
+  private buildUrl(options: VideosRequest): string {
     if (!options.query) {
       return this.buildPopularUrl(options);
     }
@@ -48,9 +43,26 @@ export default class XvideosProvider implements ContentProvider {
     return `${this.baseUrl}/?k=${encodeURIComponent(options.query)}&${pageParam}${sortParam ? "&" + sortParam : ""}`;
   }
 
-  private buildPopularUrl(options: SearchOptions): string {
+  private getPreviousMonth(): string {
+    const date = new Date();
+    // Set to previous month by subtracting 1 month
+    date.setMonth(date.getMonth() - 1);
+
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // getMonth() returns 0-11
+    const formattedMonth = month.toString().padStart(2, "0");
+
+    return `${year}-${formattedMonth}`;
+  }
+
+  private getBestPath(options: VideosRequest): string {
+    return options.sort === "new" ? "new" : `best/${this.getPreviousMonth()}`;
+  }
+
+  private buildPopularUrl(options: VideosRequest): string {
     const page = options?.page || 1;
-    let path = options.sort == "new" ? "new" : "best";
+
+    let path = this.getBestPath(options);
     return `${this.baseUrl}/${path}/${page}`;
   }
 
@@ -88,9 +100,11 @@ export default class XvideosProvider implements ContentProvider {
         const viewsText = $metadata.text();
         const views = this.parseViews(viewsText);
 
+        const displayId = url.match(/video\.[^/]+/)?.[0] || "";
+
         results.push(
           new Video({
-            displayId: url.split("/").pop() || "",
+            displayId,
             title,
             url: `${this.baseUrl}${url}`,
             duration,
@@ -100,7 +114,7 @@ export default class XvideosProvider implements ContentProvider {
             uploader,
             uploaderUrl: uploaderUrl ? `${this.baseUrl}${uploaderUrl}` : undefined,
             verified,
-          })
+          }),
         );
       } catch (error) {
         console.warn("Error parsing video:", error);

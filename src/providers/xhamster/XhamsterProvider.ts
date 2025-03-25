@@ -1,11 +1,9 @@
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-
+import { parseProxy } from "@hottubapp/core";
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
-import { ContentProvider, VideoResult } from "@/types";
-import { Video } from "@/models/Video";
-import { SearchOptions } from "@/models/SearchOptions";
+import { ContentProvider, VideosResponse, VideosRequest, Video } from "@hottubapp/core";
 import { XHAMSTER_CHANNEL, SORT_OPTIONS } from "./XhamsterChannel";
 
 // Use the stealth plugin
@@ -15,11 +13,11 @@ export default class XhamsterProvider implements ContentProvider {
   readonly channel = XHAMSTER_CHANNEL;
   private readonly baseUrl = "https://xhamster.com";
 
-  public async getVideos(options: SearchOptions): Promise<VideoResult> {
+  public async getVideos(options: VideosRequest): Promise<VideosResponse> {
     const url = this.buildUrl(options);
 
     try {
-      const content = await this.fetchData(url);
+      const content = await this.fetchData(url, options.proxy);
       const $ = cheerio.load(content);
       const videos = this.parseVideos($);
 
@@ -27,9 +25,8 @@ export default class XhamsterProvider implements ContentProvider {
       const hasMore = $(".thumb-list__item.video-thumb").length === 36;
 
       return {
-        videos,
-        totalResults: -1, // XHamster doesn't provide total count
-        hasNextPage: hasMore,
+        items: videos,
+        pageInfo: { hasNextPage: hasMore },
       };
     } catch (error) {
       console.error("Error fetching videos:", error);
@@ -37,15 +34,14 @@ export default class XhamsterProvider implements ContentProvider {
     }
   }
 
-  private buildUrl(options: SearchOptions): string {
+  private buildUrl(options: VideosRequest): string {
     if (!options.query) {
       return this.buildPopularUrl(options);
     }
 
     const page = options?.page || 1;
     const params = new URLSearchParams();
-    params.set("k", encodeURIComponent(options.query));
-    params.set("p", String(Math.max(0, page - 1)));
+    params.set("page", String(Math.max(1, page)));
 
     // Handle sort option
     const sortValue = options.sort;
@@ -53,12 +49,38 @@ export default class XhamsterProvider implements ContentProvider {
       params.set(SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].id, "");
     }
 
-    return `${this.baseUrl}/?${params.toString()}`;
+    return `${this.baseUrl}/search/${options.query}?${params.toString()}`;
   }
 
-  private buildPopularUrl(options: SearchOptions): string {
-    const page = options?.page || 1;
-    return `${this.baseUrl}/${page}`;
+  private buildPopularUrl(options: VideosRequest): string {
+    let page = "";
+    if (options?.page && options?.page > 1) {
+      page = `/${Math.max(1, options.page)}`;
+    }
+    const sortValue = options?.sort;
+    let url = `${this.baseUrl}`;
+
+    if (typeof sortValue === "string" && sortValue in SORT_OPTIONS) {
+      let path = SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].id;
+      switch (path) {
+        case "relevance":
+          break;
+        case "new":
+          url += "/newest";
+          break;
+        case "views":
+          url += "/most-viewed/weekly";
+          break;
+        case "rating":
+          url += "/best/weekly";
+          break;
+        case "duration":
+          url += "/best/monthly?min-duration=30";
+          break;
+      }
+    }
+
+    return `${url}${page}`;
   }
 
   private parseVideos($: CheerioAPI): Video[] {
@@ -83,7 +105,7 @@ export default class XhamsterProvider implements ContentProvider {
 
         // Duration - updated selector
         const duration = this.parseDuration(
-          $el.find(".thumb-image-container__duration [data-role='video-duration'] .tiny-8643e").text().trim()
+          $el.find(".thumb-image-container__duration [data-role='video-duration'] .tiny-8643e").text().trim(),
         );
 
         // Views
@@ -112,7 +134,7 @@ export default class XhamsterProvider implements ContentProvider {
                 : `${this.baseUrl}${uploaderUrl}`
               : undefined,
             verified,
-          })
+          }),
         );
       } catch (error) {
         console.warn("Error parsing video:", error);
@@ -147,12 +169,31 @@ export default class XhamsterProvider implements ContentProvider {
     return Math.round(value);
   }
 
-  private async fetchData(url: string): Promise<string> {
+  private async fetchData(url: string, proxy?: string): Promise<string> {
+    const { host, port, username, password } = parseProxy(proxy);
+
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      acceptInsecureCerts: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        ...(host && port ? [`--proxy-server=http://${host}:${port}`] : []),
+      ],
     });
+
+    // Get the default browser context and set the cookie
+    const context = browser.defaultBrowserContext();
+    await context.setCookie({
+      name: "parental-control",
+      value: "yes",
+      domain: ".xhamster.com",
+    });
+
     const page = await browser.newPage();
+
+    // Add proxy authentication headers if credentials exist
+    if (username && password) await page.authenticate({ username, password });
 
     await page.setRequestInterception(true);
     page.on("request", (request) => {

@@ -10,11 +10,16 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/types/*": ["./types/*"],
+      "@/models/*": ["./models/*"],
+      "@/providers/*": ["./providers/*"],
+      "@/utils/*": ["./utils/*"]
     },
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "declaration": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

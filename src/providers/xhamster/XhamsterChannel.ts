@@ -1,4 +1,4 @@
-import { Channel, ChannelStatus } from "@/types";
+import { Channel, ChannelStatus, ChannelOption } from "@hottubapp/core";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
@@ -13,6 +13,7 @@ export const XHAMSTER_CHANNEL: Channel = {
   name: "XHamster",
   description: "XHamster is a porn site that allows you to watch porn videos for free.",
   favicon: "https://www.google.com/s2/favicons?sz=64&domain=https://xhamster.com",
+  // favicon: "https://cdn.hottubapp.io/assets/channels/hamster.png",
   status: ChannelStatus.Active,
   options: [
     {
@@ -20,10 +21,10 @@ export const XHAMSTER_CHANNEL: Channel = {
       title: "Sort",
       systemImage: "list.number",
       colorName: "indigo",
-      options: Object.values(SORT_OPTIONS).map(({ id, title }) => ({ id, title })),
+      options: Object.values(SORT_OPTIONS) as ChannelOption[],
     },
   ],
   categories: [],
   nsfw: true,
-  ytdlpCommand: "--format all[vcodec^=avc1][ext=mp4]",
+  ytdlpCommand: "--format all[vcodec^=avc1]",
 };

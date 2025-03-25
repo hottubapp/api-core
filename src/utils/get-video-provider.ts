@@ -1,5 +1,5 @@
 import * as providers from "@/providers";
-import { ContentProvider } from "@/types";
+import { ContentProvider } from "@hottubapp/core";
 
 export function getProvider(network: string): ContentProvider {
   const Provider = providers[network.toLowerCase() as keyof typeof providers];
