@@ -122,7 +122,7 @@ export default class XnxxProvider implements ContentProvider {
             thumb,
             uploader: uploader || undefined,
             uploaderUrl: uploaderUrl ? `${this.baseUrl}${uploaderUrl}` : undefined,
-          }),
+          })
         );
       } catch (error) {
         console.warn("Error parsing video:", error);

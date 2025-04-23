@@ -89,7 +89,7 @@ export default class PornhubProvider implements ContentProvider {
           uploader,
           uploaderUrl: uploaderUrl ? `https://pornhub.com${uploaderUrl}` : undefined,
           verified,
-        }),
+        })
       );
     });
 
@@ -118,10 +118,10 @@ export default class PornhubProvider implements ContentProvider {
     const multiplier = number.includes("K")
       ? 1000
       : number.includes("M")
-        ? 1000000
-        : number.includes("B")
-          ? 1000000000
-          : 1;
+      ? 1000000
+      : number.includes("B")
+      ? 1000000000
+      : 1;
     return parseFloat(number) * multiplier;
   }
 }

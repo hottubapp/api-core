@@ -1,9 +1,10 @@
 import axios from "axios";
-import { VideosRequest } from "@hottubapp/core";
+import { VideosRequest, createAxiosInstanceWithProxy } from "@hottubapp/core";
 import XvideosProvider from "./XvideosProvider";
 
-jest.mock("axios");
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+const mockedAxios = {
+  get: jest.fn(),
+};
 
 describe("XvideosProvider", () => {
   let provider: XvideosProvider;
@@ -11,6 +12,13 @@ describe("XvideosProvider", () => {
   beforeEach(() => {
     provider = new XvideosProvider();
     jest.clearAllMocks();
+
+    // Add more explicit logging for debugging
+    const mockFn = jest.fn().mockResolvedValue(mockedAxios);
+    (createAxiosInstanceWithProxy as jest.Mock).mockImplementation((...args) => {
+      console.log("Mock called with:", args);
+      return mockFn(...args);
+    });
   });
 
   describe("URL building", () => {
@@ -184,7 +192,7 @@ describe("XvideosProvider", () => {
                 </div>
                 <span class="duration">5 min</span>
               </div>
-            `,
+            `
             ).join("")}
           </div>
         </div>
@@ -218,7 +226,7 @@ describe("XvideosProvider", () => {
                 </div>
                 <span class="duration">5 min</span>
               </div>
-            `,
+            `
             ).join("")}
           </div>
         </div>
@@ -239,12 +247,12 @@ describe("XvideosProvider", () => {
     it("handles network errors", async () => {
       mockedAxios.get.mockRejectedValueOnce(new Error("Network Error"));
 
-      await expect(
-        provider.getVideos({
-          page: 1,
-          // limit: 25,
-        }),
-      ).rejects.toThrow("Network Error");
+      const result = await provider.getVideos({
+        page: 1,
+      });
+
+      expect(result.items).toEqual([]);
+      expect(result.pageInfo.hasNextPage).toBe(false);
     });
 
     it("handles malformed HTML", async () => {

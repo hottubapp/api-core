@@ -1,4 +1,4 @@
-import { Channel, ChannelStatus, ChannelOption } from "@hottubapp/core";
+import { Channel, ChannelStatus, ChannelOptionChoice } from "@hottubapp/core";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
@@ -20,7 +20,7 @@ export const PORNHUB_CHANNEL: Channel = {
       title: "Sort",
       systemImage: "list.number",
       colorName: "indigo",
-      options: Object.values(SORT_OPTIONS) as ChannelOption[],
+      options: Object.values(SORT_OPTIONS) as ChannelOptionChoice[],
     },
   ],
   categories: [],

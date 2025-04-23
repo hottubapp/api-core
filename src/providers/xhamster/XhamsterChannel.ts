@@ -1,11 +1,11 @@
-import { Channel, ChannelStatus, ChannelOption } from "@hottubapp/core";
+import { Channel, ChannelStatus, ChannelOptionChoice } from "@hottubapp/core";
 
 export const SORT_OPTIONS = {
   relevance: { id: "relevance", title: "Most Relevant", value: "" },
-  new: { id: "new", title: "Newest", value: "sort=newest" },
-  views: { id: "views", title: "Most Viewed", value: "sort=views" },
-  rating: { id: "rating", title: "Top Rated", value: "sort=rating" },
-  duration: { id: "duration", title: "Longest", value: "sort=duration" },
+  new: { id: "new", title: "Newest", value: "newest" },
+  views: { id: "views", title: "Most Viewed", value: "views" },
+  rating: { id: "rating", title: "Top Rated", value: "rating" },
+  duration: { id: "duration", title: "Longest", value: "duration" },
 } as const;
 
 export const XHAMSTER_CHANNEL: Channel = {
@@ -21,10 +21,11 @@ export const XHAMSTER_CHANNEL: Channel = {
       title: "Sort",
       systemImage: "list.number",
       colorName: "indigo",
-      options: Object.values(SORT_OPTIONS) as ChannelOption[],
+      options: Object.values(SORT_OPTIONS) as ChannelOptionChoice[],
     },
   ],
   categories: [],
   nsfw: true,
   ytdlpCommand: "--format all[vcodec^=avc1]",
+  cacheDuration: 3600, // 1 hour
 };

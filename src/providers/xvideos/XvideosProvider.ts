@@ -11,7 +11,8 @@ export default class XvideosProvider implements ContentProvider {
     const url = this.buildUrl(options);
 
     // console.log("🔎 [XvideosProvider] url", url);
-    const axiosInstance = await createAxiosInstanceWithProxy(options.proxy);
+    const axiosInstance = createAxiosInstanceWithProxy(options.proxy);
+
     const response = await axiosInstance.get(url);
     const $ = cheerio.load(response.data);
     const videos = this.parseVideos($);

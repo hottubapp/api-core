@@ -1,6 +1,6 @@
 {
   "name": "@hottubapp/api-core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -33,7 +33,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@hottubapp/core": "^1.0.0-1",
+    "@hottubapp/core": "^1.0.0-2",
     "@types/http-proxy-agent": "^4.0.0",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",

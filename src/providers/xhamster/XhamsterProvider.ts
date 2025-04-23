@@ -46,7 +46,10 @@ export default class XhamsterProvider implements ContentProvider {
     // Handle sort option
     const sortValue = options.sort;
     if (typeof sortValue === "string" && sortValue in SORT_OPTIONS) {
-      params.set(SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS].id, "");
+      let sortOption = SORT_OPTIONS[sortValue as keyof typeof SORT_OPTIONS];
+      if (sortOption.value) {
+        params.set("sort", sortOption.value);
+      }
     }
 
     return `${this.baseUrl}/search/${options.query}?${params.toString()}`;
@@ -105,7 +108,7 @@ export default class XhamsterProvider implements ContentProvider {
 
         // Duration - updated selector
         const duration = this.parseDuration(
-          $el.find(".thumb-image-container__duration [data-role='video-duration'] .tiny-8643e").text().trim(),
+          $el.find(".thumb-image-container__duration [data-role='video-duration'] .tiny-8643e").text().trim()
         );
 
         // Views
@@ -134,7 +137,7 @@ export default class XhamsterProvider implements ContentProvider {
                 : `${this.baseUrl}${uploaderUrl}`
               : undefined,
             verified,
-          }),
+          })
         );
       } catch (error) {
         console.warn("Error parsing video:", error);
@@ -170,6 +173,7 @@ export default class XhamsterProvider implements ContentProvider {
   }
 
   private async fetchData(url: string, proxy?: string): Promise<string> {
+    console.log("🔎 [fetchData] fetching data from Xhamster", url);
     const { host, port, username, password } = parseProxy(proxy);
 
     const browser = await puppeteer.launch({
@@ -204,7 +208,35 @@ export default class XhamsterProvider implements ContentProvider {
       }
     });
 
+    let redirectedUrl: string | null = null;
+
+    page.on("request", (request) => {
+      if (request.isNavigationRequest() && request.redirectChain().length > 0) {
+        const originalUrl = new URL(request.redirectChain()[0].url());
+        const pageParam = originalUrl.searchParams.get("page");
+        const redirectUrl = new URL(request.url());
+
+        if (pageParam) {
+          redirectUrl.searchParams.set("page", pageParam);
+          redirectedUrl = redirectUrl.toString();
+        }
+
+        /*
+        console.log("Redirect detected:", {
+          from: request.redirectChain()[0].url(),
+          to: redirectedUrl || request.url(),
+        });
+        */
+      }
+    });
+
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+
+    // If we were redirected and had a page parameter, go to the correct page
+    if (redirectedUrl) {
+      await page.goto(redirectedUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
+    }
+
     const content = await page.content();
     await browser.close();
 

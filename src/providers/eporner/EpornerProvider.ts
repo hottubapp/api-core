@@ -98,7 +98,7 @@ export default class EpornerProvider implements ContentProvider {
           uploaderId: undefined,
           aspectRatio: undefined,
           performers: undefined,
-        }),
+        })
     );
   }
 
