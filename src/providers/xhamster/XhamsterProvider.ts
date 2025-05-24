@@ -1,9 +1,9 @@
+import { parseProxy } from "@hottubapp/core";
+import { ContentProvider, VideosResponse, VideosRequest, Video } from "@hottubapp/core";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import { parseProxy } from "@hottubapp/core";
 import * as cheerio from "cheerio";
 import type { CheerioAPI } from "cheerio";
-import { ContentProvider, VideosResponse, VideosRequest, Video } from "@hottubapp/core";
 import { XHAMSTER_CHANNEL, SORT_OPTIONS } from "./XhamsterChannel";
 
 // Use the stealth plugin
@@ -108,7 +108,7 @@ export default class XhamsterProvider implements ContentProvider {
 
         // Duration - updated selector
         const duration = this.parseDuration(
-          $el.find(".thumb-image-container__duration [data-role='video-duration'] .tiny-8643e").text().trim()
+          $el.find(".thumb-image-container__duration [data-role='video-duration'] .tiny-8643e").text().trim(),
         );
 
         // Views
@@ -137,7 +137,7 @@ export default class XhamsterProvider implements ContentProvider {
                 : `${this.baseUrl}${uploaderUrl}`
               : undefined,
             verified,
-          })
+          }),
         );
       } catch (error) {
         console.warn("Error parsing video:", error);
@@ -178,20 +178,13 @@ export default class XhamsterProvider implements ContentProvider {
 
     const browser = await puppeteer.launch({
       headless: true,
+      // @ts-ignore puppeteer-extra-plugin-stealth
       acceptInsecureCerts: true,
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
         ...(host && port ? [`--proxy-server=http://${host}:${port}`] : []),
       ],
-    });
-
-    // Get the default browser context and set the cookie
-    const context = browser.defaultBrowserContext();
-    await context.setCookie({
-      name: "parental-control",
-      value: "yes",
-      domain: ".xhamster.com",
     });
 
     const page = await browser.newPage();

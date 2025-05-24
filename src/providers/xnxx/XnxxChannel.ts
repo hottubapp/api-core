@@ -26,4 +26,5 @@ export const XNXX_CHANNEL: Channel = {
   ],
   categories: [],
   nsfw: true,
+  cacheDuration: 3600, // 1 hour
 };

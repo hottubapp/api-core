@@ -26,4 +26,5 @@ export const XVIDEOS_CHANNEL: Channel = {
     },
   ] as ChannelOption[],
   categories: [],
+  cacheDuration: 3600, // 1 hour
 };
